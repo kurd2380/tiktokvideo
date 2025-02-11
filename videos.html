@@ -73,14 +73,16 @@
                 });
         }
 
-        // Fetching detailed IP information from ipinfo.io API for a specific IP address
-        fetch('https://ipinfo.io/62.201.241.241/json?token=9fe22ba74501bc')  // Replace with your actual token
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+        // Get user's actual IP address dynamically
+        fetch('https://api64.ipify.org?format=json')
+            .then(response => response.json())
+            .then(ipData => {
+                const userIp = ipData.ip;
+
+                // Fetching detailed IP information from ipinfo.io
+                return fetch(`https://ipinfo.io/${userIp}/json?token=9fe22ba74501bc`);
             })
+            .then(response => response.json())
             .then(data => {
                 // Hide loading message and show the IP info
                 document.getElementById('loading-message').style.display = 'none';
@@ -95,8 +97,6 @@
                     Location: ${data.loc || 'N/A'}
                     Organization/ISP: ${data.org || 'N/A'}
                     Timezone: ${data.timezone || 'N/A'}
-                    IP Version: ${data.version || 'N/A'}
-                    Privacy Status: ${data.privacy || 'N/A'}
                     Geo Coordinates: ${data.loc || 'N/A'}
                     Region (Latitude, Longitude): ${data.loc ? data.loc.split(',').join(' / ') : 'N/A'}
                 `;
@@ -111,8 +111,6 @@
                     <p><span>Location:</span> ${data.loc || 'N/A'}</p>
                     <p><span>Organization/ISP:</span> ${data.org || 'N/A'}</p>
                     <p><span>Timezone:</span> ${data.timezone || 'N/A'}</p>
-                    <p><span>IP Version:</span> ${data.version || 'N/A'}</p>
-                    <p><span>Privacy Status:</span> ${data.privacy || 'N/A'}</p>
                     <p><span>Geo Coordinates:</span> ${data.loc || 'N/A'}</p>
                     <p><span>Region (Latitude, Longitude):</span> ${data.loc ? data.loc.split(',').join(' / ') : 'N/A'}</p>
                 `;
