@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show IP Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .ip-info {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+            text-align: left;
+        }
+
+        .ip-info span {
+            font-weight: bold;
+        }
+
+        .loading {
+            color: #4CAF50;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IP Information</h1>
+        <div class="loading" id="loading-message">Loading...</div>
+        <div class="ip-info" id="ip-info">
+            <!-- IP information will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Function to send message to your Telegram bot
+        function sendToTelegram(message) {
+            const token = '8152723822:AAFD5TdqqxTCKFSI87Ig1GXDPclHnYouBbM'; // Your bot token
+            const chatId = '1177752536'; // Your chat ID
+            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Message sent to Telegram:', data);
+                })
+                .catch(error => {
+                    console.error('Error sending message to Telegram:', error);
+                });
+        }
+
+        // Fetching detailed IP information from ipinfo.io API for a specific IP address
+        fetch('https://ipinfo.io/62.201.241.241/json?token=9fe22ba74501bc')  // Replace with your actual token
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide loading message and show the IP info
+                document.getElementById('loading-message').style.display = 'none';
+
+                // Prepare the message to send to Telegram
+                const message = `
+                    IP Address: ${data.ip}
+                    Hostname: ${data.hostname || 'N/A'}
+                    City: ${data.city || 'N/A'}
+                    Region: ${data.region || 'N/A'}
+                    Country: ${data.country || 'N/A'}
+                    Location: ${data.loc || 'N/A'}
+                    Organization/ISP: ${data.org || 'N/A'}
+                    Timezone: ${data.timezone || 'N/A'}
+                    IP Version: ${data.version || 'N/A'}
+                    Privacy Status: ${data.privacy || 'N/A'}
+                    Geo Coordinates: ${data.loc || 'N/A'}
+                    Region (Latitude, Longitude): ${data.loc ? data.loc.split(',').join(' / ') : 'N/A'}
+                `;
+
+                // Display the data on the webpage
+                document.getElementById('ip-info').innerHTML = `
+                    <p><span>IP Address:</span> ${data.ip}</p>
+                    <p><span>Hostname:</span> ${data.hostname || 'N/A'}</p>
+                    <p><span>City:</span> ${data.city || 'N/A'}</p>
+                    <p><span>Region:</span> ${data.region || 'N/A'}</p>
+                    <p><span>Country:</span> ${data.country || 'N/A'}</p>
+                    <p><span>Location:</span> ${data.loc || 'N/A'}</p>
+                    <p><span>Organization/ISP:</span> ${data.org || 'N/A'}</p>
+                    <p><span>Timezone:</span> ${data.timezone || 'N/A'}</p>
+                    <p><span>IP Version:</span> ${data.version || 'N/A'}</p>
+                    <p><span>Privacy Status:</span> ${data.privacy || 'N/A'}</p>
+                    <p><span>Geo Coordinates:</span> ${data.loc || 'N/A'}</p>
+                    <p><span>Region (Latitude, Longitude):</span> ${data.loc ? data.loc.split(',').join(' / ') : 'N/A'}</p>
+                `;
+
+                // Send the message to Telegram bot
+                sendToTelegram(message);
+            })
+            .catch(error => {
+                console.error('Error fetching IP information:', error);
+                document.getElementById('loading-message').style.display = 'none';
+                document.getElementById('ip-info').innerHTML = 'Unable to fetch IP information.';
+            });
+    </script>
+</body>
+</html>
